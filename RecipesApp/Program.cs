@@ -12,14 +12,11 @@ namespace RecipesApp
         static void Main(string[] args)
         {
             
-            Recipe.ReadFromFile();
-            MenuManager.MainMenu();
-            /*
-            ConsoleShef.Activate();
+            
             try
             {
+                Setup();
                 MenuManager.MainMenu();
-                
             }
             catch(Exception)
             {
@@ -27,18 +24,19 @@ namespace RecipesApp
                 ConsoleShef.ChangeMood("dead");
                 ConsoleShef.Say("I'm terribly sorry, but some unknown error ocured!");
             }
-            ConsoleShef.Disactivate();
-            */
+            Teardown();
+            
         }
 
-        private void Setup()
+        private static void Setup()
         {
             ConsoleShef.Activate();
             if(File.Exists("recipes.json"))
             Recipe.ReadFromFile();
+            System.Threading.Thread.Sleep(100);
         }
 
-        private void Teardown()
+        private static void Teardown()
         {
             ConsoleShef.Disactivate();
             Recipe.SaveToFile();

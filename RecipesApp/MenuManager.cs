@@ -10,6 +10,17 @@ namespace RecipesApp
     public class MenuManager
     {
         private delegate void PlayScript();
+        private static Dictionary<string, bool> _isTutorialPassed = new Dictionary<string, bool>
+        {
+            ["Main"] = false,
+            ["EditIngredient"] = false,
+            ["EditCalories"] = false,
+            ["Find"] = false,
+            ["Edit"] = false,
+            ["EditIngredientList"] = false,
+            ["Add"] = false,
+            ["Delete"] = false
+        };
         private static int Menu(string header, int menuWidth, PlayScript script, params string[] options)
         {
             Console.Clear();
@@ -101,7 +112,7 @@ namespace RecipesApp
             if (chosenRecipe == null) return;
 
             Console.Clear();
-            var option = Menu("Edit Recipe", 73, BlankScript, "Change Name", "Change duration", "Change Calories Quantity",
+            var option = Menu("Edit Recipe", 73, EditMenuIntro, "Change Name", "Change duration", "Change Calories Quantity",
                 "Change Ingredients List");
             switch (option)
             {
@@ -117,7 +128,7 @@ namespace RecipesApp
                     chosenRecipe.Duration = duration;
                     break;
                 case 2:
-                    var chose = Menu("Calories", 43, BlankScript, "Proteins", "Fats", "Carbonohydrates","Back");
+                    var chose = Menu("Calories", 43, EditCaloriesIntro, "Proteins", "Fats", "Carbonohydrates","Back");
                     switch (chose)
                     {
                         case -1:
@@ -137,7 +148,7 @@ namespace RecipesApp
                     }
                     break;
                 case 3:             
-                    var chosen = Menu("Ingredients", 43, BlankScript, "Add Ingredient", "Delete Ingredient", "Edit Ingredient", "Back");
+                    var chosen = Menu("Ingredients", 43, Unfinished, "Add Ingredient", "Delete Ingredient", "Edit Ingredient", "Back");
                     switch (chosen)
                     {
                         case -1:
@@ -156,7 +167,7 @@ namespace RecipesApp
                             break;
                         case 2:
                             var chosenIngredient = GetIngredient(chosenRecipe);
-                            var op = Menu("Edit Ingredient", 43, BlankScript, "Change Name", "Change Unit", "Change Quantity", "Back");
+                            var op = Menu("Edit Ingredient", 43, Unfinished, "Change Name", "Change Unit", "Change Quantity", "Back");
                             switch (op)
                             {
                                 case -1:
@@ -199,6 +210,14 @@ namespace RecipesApp
         {
             Console.Clear();
             DrawHeader(header,73);
+            if (!_isTutorialPassed["Find"])
+            {
+                ConsoleShef.ChangeMood("surprized");
+                ConsoleShef.Say("this is search menu");
+                ConsoleShef.ChangeMood("puzzled");
+                ConsoleShef.Say("Firstly, enter filter row by wich i will search recipes");
+                ConsoleShef.Say("This can be the name of the whole recipe or it's particular ingredient");
+            }
             Console.WriteLine("Please, enter name of recipe or name of ingredient:");
             var filter = Console.ReadLine().Trim().ToLower();
             Console.Write("Searching");
@@ -226,7 +245,7 @@ namespace RecipesApp
             {
                 recipesArray[i] = recipesList[i].ToString();
             }
-            int chosenRecipe = Menu("Search results", 73, BlankScript, recipesArray);
+            int chosenRecipe = Menu("Search results", 73, SearchMenuIntro, recipesArray);
             if (chosenRecipe == -1) return null;
             var recipe = recipesList[chosenRecipe];
             return recipe;
@@ -248,6 +267,7 @@ namespace RecipesApp
         {
             Console.Clear();
             DrawHeader("add recipe", 73);
+            AddMenuIntro();
             Console.WriteLine("Please, enter your recipie.");
             Console.WriteLine("If you don't know some parameters just left fields empty and press ENTER.\n");
             Console.WriteLine("Enter name of your recipe: ");
@@ -295,6 +315,7 @@ namespace RecipesApp
 
         private static void DeleteRecipe()
         {
+            DeleteMenuIntro();
             var chosenRecipe = SearchRecipes("Delete Recipe");
             if (chosenRecipe == null) return;
             Console.WriteLine("Enter CONFIRM to delete recipe");
@@ -327,14 +348,118 @@ namespace RecipesApp
         }
         // ConsoleShef Scenarios
         private static void BlankScript()
+        {            
+        }   
+        private static void Unfinished()
         {
-
-        }       
+            System.Threading.Thread.Sleep(100);
+            ConsoleShef.ChangeMood("angry");
+            ConsoleShef.Say("Didn't have time for that");
+            ConsoleShef.ChangeMood("happy");
+            ConsoleShef.Say("But i'm sure you will deal with it!");
+            ConsoleShef.ChangeMood("regular");
+        }
         private static void MainMenuIntro()
         {
-            ConsoleShef.ChangeMood("regular");
+            if (_isTutorialPassed["Main"])
+            {
+                BlankScript();
+                return;
+            }
+
+            ConsoleShef.ChangeMood("happy");
             ConsoleShef.Say("Hello!");
+            ConsoleShef.ChangeMood("surprized");
             ConsoleShef.Say("this is main menu");
+            ConsoleShef.ChangeMood("puzzled");
+            ConsoleShef.Say("You can navigate with arrows on your keyboard");
+            ConsoleShef.Say("Press Enter to select an option, or press esc to quit menu");
+            ConsoleShef.ChangeMood("regular");
+            ConsoleShef.Say("This rules are same for all menues");
+            ConsoleShef.ChangeMood("doubtful");
+            ConsoleShef.Say("if I annoy you way too much you can always turn my hints off.");
+            ConsoleShef.ChangeMood("regular");
+            _isTutorialPassed["Main"] = true;
+            
+        }
+        private static void SearchMenuIntro()
+        {
+            if (_isTutorialPassed["Find"])
+            {
+                BlankScript();
+                return;
+            }          
+            ConsoleShef.ChangeMood("advicing");
+            ConsoleShef.Say("Choose any available recipe from occured list and see it full information");
+            ConsoleShef.ChangeMood("regular");
+            _isTutorialPassed["Find"] = true;
+        }
+        private static void AddMenuIntro()
+        {
+            if (_isTutorialPassed["Add"])
+            {
+                BlankScript();
+                return;
+            }
+            System.Threading.Thread.Sleep(100);
+            ConsoleShef.ChangeMood("surprized");
+            ConsoleShef.Say("here you can add new recipe");
+            ConsoleShef.ChangeMood("puzzled");
+            ConsoleShef.Say("Simply follow given below instructions.");
+            ConsoleShef.ChangeMood("sad");
+            ConsoleShef.Say("it's really hard to mess things up here");
+            ConsoleShef.ChangeMood("regular");
+
+            _isTutorialPassed["Add"] = true;
+
+        }
+        private static void DeleteMenuIntro()
+        {
+            if (_isTutorialPassed["Delete"])
+            {
+                BlankScript();
+                return;
+            }
+            System.Threading.Thread.Sleep(100);
+            ConsoleShef.ChangeMood("surprized");
+            ConsoleShef.Say("here you can delete recipe");
+            ConsoleShef.ChangeMood("puzzled");
+            ConsoleShef.Say("Rules are all the same with search menu");
+            ConsoleShef.ChangeMood("regular");
+            ConsoleShef.Say("After choosing recipe type confirm to approve its deletion");
+            ConsoleShef.ChangeMood("happy");
+            ConsoleShef.Say("Easy,right?");
+            ConsoleShef.ChangeMood("regular");
+
+            _isTutorialPassed["Delete"] = true;
+        }
+        private static void EditMenuIntro()
+        {
+            if (_isTutorialPassed["Edit"])
+            {
+                BlankScript();
+                return;
+            }
+            System.Threading.Thread.Sleep(100);
+            ConsoleShef.ChangeMood("surprized");
+            ConsoleShef.Say("in this menu you can edit your recipes");
+            ConsoleShef.ChangeMood("regular");
+            ConsoleShef.Say("to start choose an option");
+            _isTutorialPassed["Edit"] = true;
+        }
+        private static void EditCaloriesIntro()
+        {
+            if (_isTutorialPassed["EditCalories"])
+            {
+                BlankScript();
+                return;
+            }
+            System.Threading.Thread.Sleep(100);
+            ConsoleShef.ChangeMood("puzzled");
+            ConsoleShef.Say("here you can change Recipe calories");
+            ConsoleShef.ChangeMood("regular");
+            ConsoleShef.Say("to continue choose an option");
+            _isTutorialPassed["EditCalories"] = true;
         }
     }
 }
