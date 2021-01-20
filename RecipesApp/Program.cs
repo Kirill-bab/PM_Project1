@@ -33,7 +33,7 @@ namespace RecipesApp
             ConsoleShef.Activate();
             if(File.Exists("recipes.json"))
             Recipe.ReadFromFile();
-            System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(1000);
         }
 
         private static void Teardown()
